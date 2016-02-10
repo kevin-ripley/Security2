@@ -4,6 +4,7 @@ import java.io.*;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Scanner;
 
 /**
  *
@@ -19,8 +20,7 @@ public class Security2 {
     private static String hash_value5 = "8cd9f1b962128bd3d3ede2f5f101f4fc";
     private static String hash_value6 = "554532464e066aba23aee72b95f18ba2";
     
-    private static String new_hash, dictionary, password;
-    private static int count;
+    private static String entry;
     private static long start, end;
     private static double elapsed;
 
@@ -29,26 +29,28 @@ public class Security2 {
      * @throws java.io.FileNotFoundException
      */
     public static void main(String[] args) throws FileNotFoundException, IOException {
+        //ask user for file input
+        Scanner reader = new Scanner(System.in);
+        System.out.println("Please enter file path with double backslashes\n(Ex. C:\\\\Users\\\\user\\\\Desktop\\\\passwordDictionary.txt):");
+        String fileName = reader.next();
         
-        //read the converted dictionary
-        FileReader hashed_file = new FileReader("C:\\Users\\smart_000\\Desktop\\output.txt");
-        try(BufferedReader hf = new BufferedReader(hashed_file)){
-            //start the timer
-            start = System.nanoTime();       
-            //read a line at a time in the converted dictionary
-            while((new_hash = hf.readLine()) != null){  
-                //add to the line count
-                count++;
-                //enter if only when dictionary hash equals one of the password hashes
-                if ((new_hash.equals(hash_value1))||(new_hash.equals(hash_value2))||(new_hash.equals(hash_value3))||(new_hash.equals(hash_value4))||(new_hash.equals(hash_value5))||(new_hash.equals(hash_value6))) { 
-                    //find the unhashed password
-                    password = findLine(count);
+        //start the timer 
+        start = System.nanoTime(); 
+        //read the dictionary
+        FileReader dictionary = new FileReader(fileName);  
+        try(BufferedReader dc = new BufferedReader(dictionary)){   
+            //read a line at a time in the dictionary
+            while((entry = dc.readLine()) != null){  
+                //convert the dictionary entry to MD5
+                String converted = getMD5(entry);
+                //enter if only when converted entry equals one of the password hashes
+                if ((converted.equals(hash_value1))||(converted.equals(hash_value2))||(converted.equals(hash_value3))||(converted.equals(hash_value4))||(converted.equals(hash_value5))||(converted.equals(hash_value6))) { 
                     //set end of search time
                     end = System.nanoTime();
                     //calculate elapsed time
                     elapsed = (double)(end - start)/1000000000; 
                     //print output
-                    System.out.println(printStatement(new_hash, password, elapsed));
+                    System.out.println(printStatement(converted, entry, elapsed));
                     //reset the timer
                     start = System.nanoTime();
                 }
@@ -62,26 +64,7 @@ public class Security2 {
         //return the output string
         return ths;
     }
-    
-    //This method finds the password in the unhashed dictionary using the line number from the hashed dictionary
-    public static String findLine(int lineNum) throws IOException{
-        //read in dictionary
-        FileReader dictionary_file = new FileReader("C:\\Users\\smart_000\\Desktop\\realhuman_phill.txt");
-        try(BufferedReader dc = new BufferedReader(dictionary_file)){  
-            //read until the password line
-            for(int i = 1; i < lineNum; i++){
-                dc.readLine();
-            }
-            //get the password
-            String line = dc.readLine();
-            //return the password
-            return line;
-        }
-    }
 
-    //WE CONVERTED THE FILE BEFORE GIVING THE PROGRAM TO YOU
-    //SO WE DO NOT CALL THIS METHOD IN main
-    
     //This method uses the MD5 Algorithm to convert the dictionary
     public static String getMD5(String oldLine) {
         //get bytes from the dictionary entry
@@ -102,29 +85,6 @@ public class Security2 {
             return hexString;
         } catch (NoSuchAlgorithmException e) {
             return "NoSuchAlgorithm";
-        }
-    }
-
-    //WE CONVERTED THE FILE BEFORE GIVING THE PROGRAM TO YOU
-    //SO WE DO NOT CALL THIS METHOD IN main
-    
-    //This method creates a new txt file with the hash values
-    public static void convert() throws IOException {
-        //read in dictionary and set up buffer
-        FileReader dict = new FileReader("/Users/kevinripley/Desktop/realhuman_phill.txt");
-        BufferedReader dr = new BufferedReader(dict);
-
-        //read through dictionary
-        while ((dictionary = dr.readLine()) != null) {
-            //convert dictionary to MD5 and store in diction
-            String diction = getMD5(dictionary);
-            //output the dictionary hash values of the dictionary to an empty txt file
-            File outFile = new File("/Users/kevinripley/Desktop/output.txt");
-            FileWriter fWriter;
-            fWriter = new FileWriter(outFile, true);
-            try (PrintWriter pWriter = new PrintWriter(fWriter)) {
-                pWriter.println(diction);
-            }
         }
     }
 }
