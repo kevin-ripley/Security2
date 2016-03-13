@@ -1,0 +1,93 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package md5;
+
+import java.util.*;
+import java.io.*;
+import java.math.BigInteger;
+import java.security.*;
+
+/**
+ *
+ * @author smart_000
+ */
+public class MD5 {
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) throws FileNotFoundException, IOException{
+        List<String> passwords = new LinkedList();
+        
+        //read in passwords
+        FileReader passFile = new FileReader("C://Users//smart_000//Desktop//md5-hash.txt");
+        try(BufferedReader buffer = new BufferedReader(passFile)){
+            while(buffer.readLine() != null)
+            {
+                passwords.add(buffer.readLine());
+            }
+        }
+        
+        //read in dictionary
+        FileReader dictionary = new FileReader("C://Users//smart_000//Desktop//realhuman_phill.txt");
+        try(BufferedReader buffer = new BufferedReader(dictionary)){
+            String line;
+            String newline;
+            
+            while(buffer.readLine() != null)
+            {
+                line = buffer.readLine();
+                System.out.println(line);
+                newline = convert(line);
+                for (String password : passwords) {
+                    if(newline.equals(password)){
+                        System.out.println("Pass: " + password + "Converted: " + line);
+                    }    
+                }
+                //System.out.println("Original: " + line + "\nConverted: " + newline);
+            }
+        }
+    }
+    
+    public static String convert(String oldLine){
+//        byte[] lineBytes = oldLine.getBytes();
+//        
+//        try{
+//            MessageDigest converter = MessageDigest.getInstance("MD5");
+//            byte[] converted = converter.digest(lineBytes);
+//            System.out.println(converted);
+//            System.out.println(converted.toString());
+//            try{
+//                String newline = new String(converted, "UTF-8");
+//                return newline;
+//            } catch (UnsupportedEncodingException ex){}
+//        } catch (NoSuchAlgorithmException ex){
+//        }
+//        return "Unfound";
+
+
+//TODO Replace with our own code
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] messageDigest = md.digest(oldLine.getBytes());
+            BigInteger number = new BigInteger(1, messageDigest);
+            String hashtext = number.toString(16);
+            // Now we need to zero pad it if you actually want the full 32 chars.
+            while (hashtext.length() < 32) {
+                hashtext = "0" + hashtext;
+            }
+            return hashtext;
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+//    public static String toHex(byte[] bytes){
+//        
+//        
+//        return hexStr;
+//    }
+}
